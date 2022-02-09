@@ -2,27 +2,25 @@ let currentDeck = [];
 let burnPile = [];
 let gilPot = 0;
 
+/*
+class Player {
+    Player(id,name,gil){
+        this.id = id;
+        this.name = name;
+        this.gil = gil;
+    }
+}
+*/
+
 let player1 = {
+    id:0,
     name:'Zac',
     dealer:false,
     gil:100,
     folded:false,
     handHole:[],
     handUp:[],
-    hit(numCards){
-        if (this.folded){
-            console.log(`${this.name} can't hit, Folded!`);
-        }else{
-            dealCard(0,numCards,this);
-        }
-    },
-    peep(player){
-        if (player.folded){
-            console.log(`Can't peep ${player.name}'s cards, Folded!`)
-        }else{
-            console.log(`${player.name}'s hole cards: ${player.handHole.sort()}`);
-        }
-    },
+    handCombined: [],
     fold(){
         while (this.handHole.length > 0 && this.handUp.length > 0){
             burnPile.push(this.handHole.pop());
@@ -41,20 +39,6 @@ let player2 = {
     folded:false,
     handHole:[],
     handUp:[],
-    hit(numCards){
-        if (this.folded){
-            console.log(`${this.name} can't hit, Folded!`);
-        }else{
-            dealCard(0,numCards,this);
-        }
-    },
-    peep(player){
-        if (player.folded){
-            console.log(`Can't peep ${player.name}'s cards, Folded!`)
-        }else{
-            console.log(`${player.name}'s hole cards: ${player.handHole.sort()}`);
-        }
-    },
     fold(){
         while (this.handHole.length > 0 && this.handUp.length > 0){
             burnPile.push(this.handHole.pop());
@@ -73,20 +57,6 @@ let player3 = {
     folded:false,
     handHole:[],
     handUp:[],
-    hit(numCards){
-        if (this.folded){
-            console.log(`${this.name} can't hit, Folded!`);
-        }else{
-            dealCard(0,numCards,this);
-        }
-    },
-    peep(player){
-        if (player.folded){
-            console.log(`Can't peep ${player.name}'s cards, Folded!`)
-        }else{
-            console.log(`${player.name}'s hole cards: ${player.handHole.sort()}`);
-        }
-    },
     fold(){
         while (this.handHole.length > 0 && this.handUp.length > 0){
             burnPile.push(this.handHole.pop());
@@ -105,20 +75,6 @@ let player4 = {
     folded:false,
     handHole:[],
     handUp:[],
-    hit(numCards){
-        if (this.folded){
-            console.log(`${this.name} can't hit, Folded!`);
-        }else{
-            dealCard(0,numCards,this);
-        }
-    },
-    peep(player){
-        if (player.folded){
-            console.log(`Can't peep ${player.name}'s cards, Folded!`)
-        }else{
-            console.log(`${player.name}'s hole cards: ${player.handHole.sort()}`);
-        }
-    },
     fold(){
         while (this.handHole.length > 0 && this.handUp.length > 0){
             burnPile.push(this.handHole.pop());
@@ -130,7 +86,7 @@ let player4 = {
     }
 }
 
-let shuffleDeck = numDecks => { //builds a currentDeck[] from numDecks of cards
+const shuffleDeck = numDecks => { //builds a currentDeck[] from numDecks of cards
     let dupes = 0;
     let drawCard = () => { //picks a random card face and suit from 2 arrays and outputs a formatted card name
         const arrayCardFace = ['A', 'K', 'Q', 'J', '10','9','8','7','6','5','4','3','2'];
@@ -157,7 +113,7 @@ let shuffleDeck = numDecks => { //builds a currentDeck[] from numDecks of cards
     }
 }
 
-let burnCard = numCards => { //pops numCards from currentDeck[] and pushes to shedPile[]
+const burnCard = numCards => { //pops numCards from currentDeck[] and pushes to shedPile[]
     //console.log(`${numCards} dealt to shed pile.`);
     for (let i = numCards - 1; i >= 0; i--){ //for numCards until it hits 0, push a card from currentDeck[] to shedPile[]
         burnPile.push(currentDeck.pop());
@@ -168,7 +124,10 @@ let burnCard = numCards => { //pops numCards from currentDeck[] and pushes to sh
     }
 }
 
-let dealCard = (holeCard = 0, upCard = 0, player) => { //pops numCards from currentDeck[] and pushes to player.hand[]
+const dealCard = (holeCard = 0, upCard = 0, player) => { //pops numCards from currentDeck[] and pushes to player.hand[]
+    if (player.folded){
+        console.log(`Can't deal to ${player.name}, folded!`);
+    }else{
     console.log(`Deal ${holeCard} hole cards and ${upCard} up cards to ${player.name}.`);
     for (let i = holeCard - 1; i >= 0; i--){ //for numCards until 0, pushes card from currentDeck[] to player.hand[]
         player.handHole.push(currentDeck.pop());
@@ -184,11 +143,38 @@ let dealCard = (holeCard = 0, upCard = 0, player) => { //pops numCards from curr
             console.log('No more cards!');
         }
     }
-}
+}}
 
-let showCards = () => {
+const showCards = () => {
     console.log(`${player1.name}'s face up cards: ${player1.handUp.sort()}`);
     console.log(`${player2.name}'s face up cards: ${player2.handUp.sort()}`);
     console.log(`${player3.name}'s face up cards: ${player3.handUp.sort()}`);
     console.log(`${player4.name}'s face up cards: ${player4.handUp.sort()}`);
 }
+
+const peepCards = (player, hand) => {
+    if (player.folded){
+        console.log(`Can't peep ${player.name}'s cards, Folded!`);
+    }else{
+        if (hand === 'hole'){
+        console.log(`${player.name}'s hole cards: ${player.handHole.sort()}`);
+        }
+        else if (hand === 'up'){
+        console.log(`${player.name}'s up cards: ${player.handUp.sort()}`);
+        }else {
+            console.log(`${player.name}'s cards: ${player.combinedHand.sort()}`);
+
+        }
+    }
+}
+
+
+
+shuffleDeck(1);
+dealCard(2,3,player1);
+player3.fold();
+dealCard(3,3,player3)
+peepCards(player1,'hole');
+peepCards(player1,'up');
+peepCards(player3,'up');
+peepCards(player3,'hole');
